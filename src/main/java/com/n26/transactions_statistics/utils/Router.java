@@ -10,9 +10,11 @@ public class Router {
     public static final String API = "api/";
     public static final String VERSION = "version/";
 
+    public static final String TRANSACTIONS_STATISTICS = API + VERSION + "statistics";
     public static final String SEARCH_TRANSACTIONS = API + VERSION + "transactions";
     public static final String CREATE_TRANSACTIONS = API + VERSION + "transactions";
     public static final String FIND_TRANSACTIONS = API + VERSION + "transactions/{id}";
     public static final String UPDATE_TRANSACTIONS = API + VERSION + "transactions/{id}";
     public static final String DELETE_TRANSACTIONS = API + VERSION + "transactions/{id}";
+    public static final String DELETE_ALL_TRANSACTIONS = API + VERSION + "transactions";
 }

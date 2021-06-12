@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,9 +19,12 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    @Query("SELECT p FROM Transaction p WHERE (:q IS NULL OR p.createdBy LIKE %:q%) AND p.deleted=FALSE")
+    @Query("SELECT t FROM Transaction t WHERE (:q IS NULL OR t.createdBy LIKE %:q%) AND t.deleted=FALSE")
     Page<Transaction> search(@Param("q") String query, Pageable pageable);
 
-    @Query("SELECT p FROM Transaction p WHERE p.id=:id AND p.deleted=FALSE")
+    @Query("SELECT t FROM Transaction t WHERE t.time between :from AND :to AND t.deleted=FALSE")
+    List<Transaction> getStatistics(@Param("from") Instant from, @Param("to") Instant to);
+
+    @Query("SELECT t FROM Transaction t WHERE t.id=:id AND t.deleted=FALSE")
     Optional<Transaction> find(@Param("id") Long id);
 }

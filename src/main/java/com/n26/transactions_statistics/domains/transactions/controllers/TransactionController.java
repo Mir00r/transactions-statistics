@@ -2,6 +2,7 @@ package com.n26.transactions_statistics.domains.transactions.controllers;
 
 import com.n26.transactions_statistics.commons.controllers.CrudController;
 import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionDto;
+import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionStatsDto;
 import com.n26.transactions_statistics.domains.transactions.models.entities.Transaction;
 import com.n26.transactions_statistics.domains.transactions.models.mappers.TransactionMapper;
 import com.n26.transactions_statistics.domains.transactions.services.TransactionService;
@@ -16,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
+import java.util.List;
 
 /**
  * @author mir00r on 12/6/21
@@ -32,6 +35,14 @@ public class TransactionController implements CrudController<TransactionDto> {
     public TransactionController(TransactionService transactionService, TransactionMapper transactionMapper) {
         this.transactionService = transactionService;
         this.transactionMapper = transactionMapper;
+    }
+
+
+    @ApiOperation(value = "Get all list of transaction", response = TransactionDto[].class)
+    @GetMapping(Router.TRANSACTIONS_STATISTICS)
+    public ResponseEntity<TransactionStatsDto> getStatistics() {
+        List<Transaction> entities = this.transactionService.statistics(Instant.now().minusSeconds(60), Instant.now());
+        return ResponseEntity.ok(this.transactionMapper.map(entities));
     }
 
     @Override
@@ -75,6 +86,14 @@ public class TransactionController implements CrudController<TransactionDto> {
     @DeleteMapping(Router.DELETE_TRANSACTIONS)
     public ResponseEntity<Object> delete(@PathVariable("id") Long id) throws NotFoundException {
         this.transactionService.delete(id, true);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @ApiOperation(value = "Delete all transaction", response = TransactionDto[].class)
+    @DeleteMapping(Router.DELETE_ALL_TRANSACTIONS)
+    public ResponseEntity<Object> deleteAll() {
+        this.transactionService.deleteAll();
         return ResponseEntity.ok().build();
     }
 }

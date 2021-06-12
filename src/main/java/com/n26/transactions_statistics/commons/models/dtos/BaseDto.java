@@ -20,6 +20,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class BaseDto implements Serializable {
 
+    @ApiModelProperty(hidden = true, example = "1", notes = "Auto incremented long value")
     private Long id;
 
     @JsonProperty(value = "created_at")

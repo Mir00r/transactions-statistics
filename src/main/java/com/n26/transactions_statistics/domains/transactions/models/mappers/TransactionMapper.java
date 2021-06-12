@@ -2,8 +2,14 @@ package com.n26.transactions_statistics.domains.transactions.models.mappers;
 
 import com.n26.transactions_statistics.commons.models.mapper.BaseMapper;
 import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionDto;
+import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionStatsDto;
 import com.n26.transactions_statistics.domains.transactions.models.entities.Transaction;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * @author mir00r on 12/6/21
@@ -15,8 +21,37 @@ public class TransactionMapper implements BaseMapper<Transaction, TransactionDto
     @Override
     public TransactionDto map(Transaction entity) {
         TransactionDto dto = new TransactionDto();
+        dto.setId(entity.getId());
+        dto.setUuid(entity.getUuid());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+
         dto.setAmount(entity.getAmount());
         dto.setTime(entity.getTime());
+        return dto;
+    }
+
+    public TransactionStatsDto map(List<Transaction> entities) {
+        TransactionStatsDto dto = new TransactionStatsDto();
+
+        dto.setCount((long) entities.size());
+        dto.setSum(entities.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+        );
+
+        dto.setMax(entities.stream()
+                .map(Transaction::getAmount)
+                .max(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO)
+        );
+        dto.setMin(entities.stream()
+                .map(Transaction::getAmount)
+                .min(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO)
+        );
+        if (!dto.getSum().equals(BigDecimal.ZERO))
+            dto.setAvg(dto.getSum().divide(BigDecimal.valueOf(entities.size()), RoundingMode.HALF_EVEN));
         return dto;
     }
 
