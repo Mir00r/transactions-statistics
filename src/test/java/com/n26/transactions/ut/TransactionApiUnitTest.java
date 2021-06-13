@@ -124,6 +124,19 @@ public class TransactionApiUnitTest {
         Assertions.assertNotNull("2", statistic.getCount().toString());
     }
 
+    @Test
+    @Order(5)
+    @SuppressWarnings("unchecked")
+    public void shouldReturnTransactionsDeleted() {
+
+        List<Transaction> transactions = this.transactionService.find();
+        if (transactions.isEmpty()) {
+            this.shouldReturnNotNullTransactionService();
+        }
+        this.transactionService.delete();
+        Assertions.assertNotNull(0L, String.valueOf(this.transactionService.find().size()));
+    }
+
     @AfterAll
     public void tearDown() {
         this.transactionService.clearObjects();
