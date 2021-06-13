@@ -38,6 +38,15 @@ public class StatisticsController {
         this.transactionMapper = transactionMapper;
     }
 
+    /**
+     * Method that returns the statistics computed on the transactions within the last 60 seconds.
+     *
+     * @author mir00r
+     * @since 13/6/21
+     * <p>
+     * 200 - OK: Everything worked as expected.
+     * 204 - Not Found: The requested resource not found.
+     */
     @ApiOperation(value = "Get all list of transaction", response = TransactionDto[].class)
     @GetMapping(Router.TRANSACTIONS_STATISTICS)
     public ResponseEntity<TransactionStatsDto> getStatistics() {
