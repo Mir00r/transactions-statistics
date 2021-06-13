@@ -40,8 +40,8 @@ public class AppUtil {
      * @author mir00r
      * @since 13/6/21
      */
-    public static long parseId(JSONObject transaction) {
-        return (long) (int) transaction.get(Constants.JSON_FIELD_ID);
+    public static Long parseId(JSONObject transaction) {
+        return Long.parseLong(transaction.get(Constants.JSON_FIELD_ID).toString());
     }
 
     /**

@@ -118,7 +118,7 @@ public class TransactionController {
      * @since 13/6/21
      */
     @ApiOperation(value = "Delete all transaction")
-    @DeleteMapping(Router.DELETE_ALL_TRANSACTIONS)
+    @DeleteMapping(value = Router.DELETE_ALL_TRANSACTIONS, produces = {"application/json"})
     public ResponseEntity<Boolean> deleteAll() {
         try {
             this.transactionService.delete();
