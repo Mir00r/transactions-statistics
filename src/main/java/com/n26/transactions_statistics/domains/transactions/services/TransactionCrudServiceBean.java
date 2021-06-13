@@ -17,12 +17,12 @@ import java.util.Optional;
  * @project IntelliJ IDEA
  */
 @Service
-public class TransactionServiceBean implements TransactionService {
+public class TransactionCrudServiceBean implements TransactionCrudService {
 
     private final TransactionRepository transactionRepository;
 
     @Autowired
-    public TransactionServiceBean(TransactionRepository transactionRepository) {
+    public TransactionCrudServiceBean(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 

@@ -1,32 +1,37 @@
 package com.n26.transactions_statistics.domains.transactions.controllers;
 
-import com.n26.transactions_statistics.commons.controllers.CrudController;
 import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionDto;
-import com.n26.transactions_statistics.domains.transactions.models.dtos.TransactionStatsDto;
 import com.n26.transactions_statistics.domains.transactions.models.entities.Transaction;
 import com.n26.transactions_statistics.domains.transactions.models.mappers.TransactionMapper;
 import com.n26.transactions_statistics.domains.transactions.services.TransactionService;
-import com.n26.transactions_statistics.exceptions.notfound.NotFoundException;
+import com.n26.transactions_statistics.utils.AppUtil;
 import com.n26.transactions_statistics.utils.Constants;
 import com.n26.transactions_statistics.utils.Router;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.time.Instant;
+import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @author mir00r on 12/6/21
+ * @author mir00r on 13/6/21
  * @project IntelliJ IDEA
  */
 @RestController
 @Api(tags = Constants.TRANSACTIONS, description = Router.REST_API)
-public class TransactionController implements CrudController<TransactionDto> {
+public class TransactionController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
     private final TransactionService transactionService;
     private final TransactionMapper transactionMapper;
@@ -38,62 +43,89 @@ public class TransactionController implements CrudController<TransactionDto> {
     }
 
 
+    /**
+     * Method that list all transaction
+     *
+     * @return ResponseEntity with a < code >List<Transaction></code> object and the HTTP status
+     * <p>
+     * HTTP Status:
+     * <p>
+     * 200 - OK: Everything worked as expected.
+     * 204 - Not Found: The requested resource not found.
+     * @author mir00r
+     * @since 13/6/21
+     */
     @ApiOperation(value = "Get all list of transaction", response = TransactionDto[].class)
-    @GetMapping(Router.TRANSACTIONS_STATISTICS)
-    public ResponseEntity<TransactionStatsDto> getStatistics() {
-        List<Transaction> entities = this.transactionService.statistics(Instant.now().minusSeconds(60), Instant.now());
-        return ResponseEntity.ok(this.transactionMapper.map(entities));
+    @GetMapping(Router.SEARCH_ALL_TRANSACTIONS)
+    public ResponseEntity<List<TransactionDto>> find() {
+        List<Transaction> entities = this.transactionService.find();
+        if (entities.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        logger.info(entities.toString());
+        return ResponseEntity.ok(entities.stream().map(this.transactionMapper::map).collect(Collectors.toList()));
     }
 
-    @Override
-    @ApiOperation(value = "Get all list of transaction", response = TransactionDto[].class)
-    @GetMapping(Router.SEARCH_TRANSACTIONS)
-    public ResponseEntity<Page<TransactionDto>> search(
-            @RequestParam(value = "q", defaultValue = "") String query,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        Page<Transaction> entities = this.transactionService.search(query, page, size);
-        return ResponseEntity.ok(entities.map(this.transactionMapper::map));
-    }
+    /**
+     * Method that creates a transaction.
+     *
+     * @param jsonTransaction, where:
+     *                         <p>
+     *                         id - transaction id;
+     *                         amount – transaction amount; a string of arbitrary length that is parsable as a BigDecimal;
+     *                         timestamp – transaction time in the ISO 8601 format
+     *                         YYYY-MM-DDThh:mm:ss.sssZ​ in the UTC timezone (this is not the current timestamp)
+     * @return ResponseEntity with a < code >Trip</code> object and the HTTP status
+     * <p>
+     * HTTP Status:
+     * <p>
+     * 201 - Created: Everything worked as expected.
+     * 400 - Bad Request: The request was unacceptable, often due to missing a required parameter.
+     * 422 - Unprocessable Entity: if any of the fields are not parsable or the initial date is greater than the final date.
+     * 500 - Server Errors: something went wrong on API end (These are rare).
+     * @author mir00r
+     * @since 13/6/21
+     */
+    @ApiOperation(value = "Create a new transaction")
+    @PostMapping(Router.CREATE_ALL_TRANSACTIONS)
+    public ResponseEntity<Transaction> create(@Valid @RequestBody JSONObject jsonTransaction) {
+        try {
+            if (AppUtil.isJSONValid(jsonTransaction.toString())) {
+                Transaction transaction = transactionService.create(jsonTransaction);
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(transaction.getUuid()).build().toUri();
 
-    @Override
-    @ApiOperation(value = "Get transaction by id", response = TransactionDto[].class)
-    @GetMapping(Router.FIND_TRANSACTIONS)
-    public ResponseEntity<TransactionDto> find(@PathVariable("id") Long id) throws NotFoundException {
-        Transaction transaction = this.transactionService.find(id).orElseThrow(() -> new NotFoundException("Transaction not found with id: " + id));
-        return ResponseEntity.ok(this.transactionMapper.map(transaction));
-    }
-
-    @Override
-    @ApiOperation(value = "Create a new transaction", response = TransactionDto[].class)
-    @PostMapping(Router.CREATE_TRANSACTIONS)
-    public ResponseEntity<TransactionDto> create(@Valid @RequestBody TransactionDto dto) {
-        Transaction entity = this.transactionService.save(this.transactionMapper.map(dto, null));
-        return ResponseEntity.ok(this.transactionMapper.map(entity));
-    }
-
-    @Override
-    @ApiOperation(value = "Update an existing transaction by id", response = TransactionDto[].class)
-    @PatchMapping(Router.UPDATE_TRANSACTIONS)
-    public ResponseEntity<TransactionDto> update(@PathVariable("id") Long id, @Valid @RequestBody TransactionDto dto) throws NotFoundException {
-        Transaction transaction = this.transactionService.find(id).orElseThrow(() -> new NotFoundException("Transaction not found with id: " + id));
-        transaction = this.transactionService.save(this.transactionMapper.map(dto, transaction));
-        return ResponseEntity.ok(this.transactionMapper.map(transaction));
-    }
-
-    @Override
-    @ApiOperation(value = "Delete transaction by id", response = TransactionDto[].class)
-    @DeleteMapping(Router.DELETE_TRANSACTIONS)
-    public ResponseEntity<Object> delete(@PathVariable("id") Long id) throws NotFoundException {
-        this.transactionService.delete(id, true);
-        return ResponseEntity.ok().build();
+                transactionService.add(transaction);
+                return ResponseEntity.created(uri).body(null);
+            } else {
+                return ResponseEntity.badRequest().body(null);
+            }
+        } catch (Exception e) {
+            logger.error("JSON fields are not parsable. " + e);
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
+        }
     }
 
 
-    @ApiOperation(value = "Delete all transaction", response = TransactionDto[].class)
+    /**
+     * Method that deletes all existing transaction.
+     *
+     * @return Returns an empty body with one of the following:
+     * <p>
+     * 204 - if delete with success
+     * 205 - if hasn't delete with success.
+     * 500 - Server Errors: something went wrong on API end (These are rare).
+     * @author mir00r
+     * @since 13/6/21
+     */
+    @ApiOperation(value = "Delete all transaction")
     @DeleteMapping(Router.DELETE_ALL_TRANSACTIONS)
-    public ResponseEntity<Object> deleteAll() {
-        this.transactionService.deleteAll();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> deleteAll() {
+        try {
+            this.transactionService.delete();
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

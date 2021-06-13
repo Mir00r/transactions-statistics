@@ -31,27 +31,30 @@ public class TransactionMapper implements BaseMapper<Transaction, TransactionDto
         return dto;
     }
 
-    public TransactionStatsDto map(List<Transaction> entities) {
+    public TransactionStatsDto mapStats(List<Transaction> entities) {
         TransactionStatsDto dto = new TransactionStatsDto();
 
         dto.setCount((long) entities.size());
         dto.setSum(entities.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP)
         );
 
         dto.setMax(entities.stream()
                 .map(Transaction::getAmount)
                 .max(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO)
+                .setScale(2, RoundingMode.HALF_UP)
         );
         dto.setMin(entities.stream()
                 .map(Transaction::getAmount)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO)
+                .setScale(2, RoundingMode.HALF_UP)
         );
-        if (!dto.getSum().equals(BigDecimal.ZERO))
-            dto.setAvg(dto.getSum().divide(BigDecimal.valueOf(entities.size()), RoundingMode.HALF_EVEN));
+        if (!dto.getSum().equals(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)))
+            dto.setAvg(dto.getSum().divide(BigDecimal.valueOf(entities.size()), RoundingMode.HALF_UP));
         return dto;
     }
 

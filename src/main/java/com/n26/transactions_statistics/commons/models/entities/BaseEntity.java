@@ -110,6 +110,17 @@ public abstract class BaseEntity implements Serializable {
         return updatedAt;
     }
 
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 
     public String getCreatedBy() {
         return createdBy;
