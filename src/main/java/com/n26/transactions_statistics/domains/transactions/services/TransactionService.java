@@ -43,7 +43,6 @@ public class TransactionService {
      */
     private void setTransactionValues(JSONObject jsonTransaction, Transaction transaction) {
 
-//        transaction.setId((long) (transactions.size() + 1));
         transaction.setId(jsonTransaction.get(Constants.JSON_FIELD_ID) != null ? AppUtil.parseId(jsonTransaction) : (long) (transactions.size() + 1));
         transaction.setAmount(jsonTransaction.get(Constants.JSON_FIELD_AMOUNT) != null ? AppUtil.parseAmount(jsonTransaction) : transaction.getAmount());
         transaction.setTime(jsonTransaction.get(Constants.JSON_FIELD_TIMESTAMP) != null ? AppUtil.parseTime(jsonTransaction) : transaction.getTime());

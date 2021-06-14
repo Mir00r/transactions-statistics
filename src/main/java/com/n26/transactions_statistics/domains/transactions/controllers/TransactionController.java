@@ -74,7 +74,7 @@ public class TransactionController {
      *                         id - transaction id;
      *                         amount – transaction amount; a string of arbitrary length that is parsable as a BigDecimal;
      *                         timestamp – transaction time in the ISO 8601 format
-     *                         YYYY-MM-DDThh:mm:ss.sssZ​ in the UTC timezone (this is not the current timestamp)
+     *                         YYYY-MM-DDThh:mm:ss.sss in the UTC timezone (this is not the current timestamp)
      * @return ResponseEntity with a < code >Trip</code> object and the HTTP status
      * <p>
      * HTTP Status:
@@ -118,7 +118,7 @@ public class TransactionController {
      * @since 13/6/21
      */
     @ApiOperation(value = "Delete all transaction")
-    @DeleteMapping(value = Router.DELETE_ALL_TRANSACTIONS, produces = {"application/json"})
+    @DeleteMapping(Router.DELETE_ALL_TRANSACTIONS)
     public ResponseEntity<Boolean> deleteAll() {
         try {
             this.transactionService.delete();

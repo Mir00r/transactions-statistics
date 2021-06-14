@@ -38,6 +38,14 @@ public class TransactionCrudController implements CrudController<TransactionDto>
         this.transactionMapper = transactionMapper;
     }
 
+    /**
+     * GET API to get all transaction data with pageable response
+     *
+     * @param query
+     * @param page
+     * @param size
+     * @return
+     */
     @Override
     @ApiOperation(value = "Get all list of transaction", response = TransactionDto[].class)
     @GetMapping(Router.SEARCH_TRANSACTIONS)
@@ -51,6 +59,13 @@ public class TransactionCrudController implements CrudController<TransactionDto>
         return ResponseEntity.ok(entities.map(this.transactionMapper::map));
     }
 
+    /**
+     * Get API to find single entry through id(primary key)
+     *
+     * @param id
+     * @return
+     * @throws NotFoundException
+     */
     @Override
     @ApiOperation(value = "Get transaction by id", response = TransactionDto[].class)
     @GetMapping(Router.FIND_TRANSACTIONS)
@@ -59,6 +74,12 @@ public class TransactionCrudController implements CrudController<TransactionDto>
         return ResponseEntity.ok(this.transactionMapper.map(transaction));
     }
 
+    /**
+     * Post API to create new transaction through json
+     *
+     * @param dto
+     * @return
+     */
     @Override
     @ApiOperation(value = "Create a new transaction", response = TransactionDto[].class)
     @PostMapping(Router.CREATE_TRANSACTIONS)
@@ -67,6 +88,14 @@ public class TransactionCrudController implements CrudController<TransactionDto>
         return ResponseEntity.ok(this.transactionMapper.map(entity));
     }
 
+    /**
+     * Patch API to update an existing entry through id(primary key)
+     *
+     * @param id
+     * @param dto
+     * @return
+     * @throws NotFoundException
+     */
     @Override
     @ApiOperation(value = "Update an existing transaction by id", response = TransactionDto[].class)
     @PatchMapping(Router.UPDATE_TRANSACTIONS)
@@ -76,6 +105,13 @@ public class TransactionCrudController implements CrudController<TransactionDto>
         return ResponseEntity.ok(this.transactionMapper.map(transaction));
     }
 
+    /**
+     * Delete API to soft delete single entry through id(primary key)
+     *
+     * @param id
+     * @return
+     * @throws NotFoundException
+     */
     @Override
     @ApiOperation(value = "Delete transaction by id", response = TransactionDto[].class)
     @DeleteMapping(Router.DELETE_TRANSACTIONS)

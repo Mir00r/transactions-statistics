@@ -18,6 +18,12 @@ import java.util.List;
 @Component
 public class TransactionMapper implements BaseMapper<Transaction, TransactionDto> {
 
+    /**
+     * Method to mapping data from entity to dto class
+     *
+     * @param entity
+     * @return
+     */
     @Override
     public TransactionDto map(Transaction entity) {
         TransactionDto dto = new TransactionDto();
@@ -31,6 +37,12 @@ public class TransactionMapper implements BaseMapper<Transaction, TransactionDto
         return dto;
     }
 
+    /**
+     * Method to mapping transaction data from entities to statistics dto class
+     *
+     * @param entities
+     * @return
+     */
     public TransactionStatsDto mapStats(List<Transaction> entities) {
         TransactionStatsDto dto = new TransactionStatsDto();
 
@@ -58,6 +70,13 @@ public class TransactionMapper implements BaseMapper<Transaction, TransactionDto
         return dto;
     }
 
+    /**
+     * Method to mapping data from dto to entity class for creating new entry
+     *
+     * @param dto
+     * @param exEntity
+     * @return
+     */
     @Override
     public Transaction map(TransactionDto dto, Transaction exEntity) {
         Transaction entity = new Transaction();
