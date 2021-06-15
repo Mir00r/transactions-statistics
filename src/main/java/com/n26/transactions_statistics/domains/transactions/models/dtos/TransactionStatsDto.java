@@ -21,16 +21,16 @@ import java.time.Instant;
 public class TransactionStatsDto {
 
     @ApiModelProperty(hidden = true, example = "1000.00", notes = "specifying the total sum of transaction value in the last 60 seconds")
-    private BigDecimal sum;
+    private String sum;
 
     @ApiModelProperty(hidden = true, example = "1000.53", notes = "specifying the average amount of transaction value in the last 60 seconds")
-    private BigDecimal avg;
+    private String avg;
 
     @ApiModelProperty(hidden = true, example = "200000.49", notes = "specifying the single highest transaction value in the last 60 seconds")
-    private BigDecimal max;
+    private String max;
 
     @ApiModelProperty(hidden = true, example = "50.49", notes = "specifying the single lowest transaction value in the last 60 seconds")
-    private BigDecimal min;
+    private String min;
 
     @ApiModelProperty(hidden = true, example = "10", notes = "specifying the number of transaction value in the last 60 seconds")
     private Long count;

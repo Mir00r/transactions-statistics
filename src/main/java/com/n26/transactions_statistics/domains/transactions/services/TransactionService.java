@@ -139,6 +139,7 @@ public class TransactionService {
      * @since 13/6/21
      */
     public void delete() {
+        this.createTransactionList();
         transactions.clear();
     }
 

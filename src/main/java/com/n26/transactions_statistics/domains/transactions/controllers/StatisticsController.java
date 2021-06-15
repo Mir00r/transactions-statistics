@@ -51,9 +51,9 @@ public class StatisticsController {
     @GetMapping(Router.TRANSACTIONS_STATISTICS)
     public ResponseEntity<TransactionStatsDto> getStatistics() {
         List<Transaction> entities = this.transactionService.find(Instant.now().minusSeconds(60), Instant.now());
-        if (entities.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+//        if (entities.isEmpty()) {
+//            return ResponseEntity.noContent().build();
+//        }
         logger.info(entities.toString());
         return ResponseEntity.ok(this.transactionMapper.mapStats(entities));
     }

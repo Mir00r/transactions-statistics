@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,8 +93,12 @@ public class TransactionController {
         try {
             if (AppUtil.isJSONValid(jsonTransaction.toString())) {
                 Transaction transaction = transactionService.create(jsonTransaction);
-                URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(transaction.getUuid()).build().toUri();
+                if (transaction.getTime().isBefore(Instant.now().minusSeconds(60)))
+                    return ResponseEntity.noContent().build();
+                if (transaction.getTime().isAfter(Instant.now()))
+                    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
 
+                URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path(transaction.getUuid()).build().toUri();
                 transactionService.add(transaction);
                 return ResponseEntity.created(uri).body(null);
             } else {
